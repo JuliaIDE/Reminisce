@@ -1,7 +1,7 @@
 Reminisce
 =========
 
-Reminisce caches your tabs (including their content) so that you can close and reopen Light Table without losing your place.
+Reminisce caches your tabs (including their content) so that you can close and reopen Light Table without losing your place. To install, simply search for "Reminisce" in the plugin manager.
 
 Features:
  * Close and reopen LT without losing data
