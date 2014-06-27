@@ -1,2 +1,2 @@
 {:+
- {}}
+ {:app {"pmeta-shift-t" [:reminisce.reopen-tab]}}}

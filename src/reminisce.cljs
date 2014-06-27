@@ -8,15 +8,9 @@
             [lt.objs.opener :as opener])
   (:require-macros [lt.macros :refer [behavior defui]]))
 
-;; Util
+;; Tab Restore
 
-(defn raise-result [obj k & args]
-  (when-let [f (-> @obj :listeners :get-state first object/->behavior :reaction)]
-    (apply f obj args)))
-
-;; Tabs
-
-(defn ->state [obj] (raise-result obj :get-state))
+(defn ->state [obj] (object/raise-reduce obj :get-state))
 
 (defmulti restore! :type)
 
@@ -35,7 +29,47 @@
                       (doseq [tab (cache/fetch ::tabs)]
                         (restore! tab))))
 
-;; Editors (tab implementation)
+;; Undo close
+
+(def queue-length 10)
+
+(def queue (atom ()))
+(def state-cache (atom {})) ; Editors are destroyed immediately, so we must cache their state
+
+(defn queue! [obj]
+  (swap! queue
+         (fn [queue]
+           (concat (if (> (count queue) queue-length)
+                     (rest queue)
+                     queue)
+                   [obj]))))
+
+(defn unqueue! []
+  (when (not-empty @queue)
+    (let [item (last @queue)]
+      (swap! queue #(drop-last 1 %))
+      item)))
+
+(behavior ::queue
+          :triggers #{:close}
+          :reaction (fn [this]
+                      (when-let [state (@state-cache this)]
+                        (queue! state))))
+
+(behavior ::cache-state
+          :triggers #{:active :save :move}
+          :reaction (fn [this]
+                      (swap! state-cache assoc this (->state this))))
+
+(cmd/command {:command :reminisce.reopen-tab
+              :desc "Tabs: Reopen the last closed tab"
+              :exec (fn []
+                      (when-let [state (unqueue!)]
+                        (tabs/active! (restore! state))))})
+
+@queue
+
+;; Implementation for Editors
 
 (defn scroll-pos [ed]
   (-> ed editor/->cm-ed .getScrollInfo (#(do [(.-left %) (.-top %)]))))
@@ -69,7 +103,8 @@
     (when (and dirty content)
       (editor/set-val ed content))
     (.setCursor (editor/->cm-ed ed) (clj->js cursor))
-    (apply editor/scroll-to ed scroll)))
+    (apply editor/scroll-to ed scroll)
+    ed))
 
 (behavior ::trigger-cache-tabs
           :triggers #{:active :save :move}
