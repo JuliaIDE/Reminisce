@@ -14,6 +14,7 @@
 
 (defmulti restore! :type)
 
+; This needs to change – walk over actual tab objects / tabsets
 (defn cache-tabs []
   (let [state (->> (pool/get-all) (map ->state) (filter identity))]
     (cache/store! ::tabs state)))
@@ -33,22 +34,22 @@
 
 (def queue-length 10)
 
-(def queue (atom ()))
 (def state-cache (atom {})) ; Editors are destroyed immediately, so we must cache their state
 
 (defn queue! [obj]
-  (swap! queue
-         (fn [queue]
-           (concat (if (> (count queue) queue-length)
-                     (rest queue)
-                     queue)
-                   [obj]))))
+  (let [queue (cache/fetch ::queue)]
+    (cache/store! ::queue
+                  (concat (if (> (count queue) queue-length)
+                            (rest queue)
+                            queue)
+                          [obj]))))
 
 (defn unqueue! []
-  (when (not-empty @queue)
-    (let [item (last @queue)]
-      (swap! queue #(drop-last 1 %))
-      item)))
+  (let [queue (cache/fetch ::queue)]
+    (when (not-empty queue)
+      (let [item (last queue)]
+        (cache/store! ::queue (drop-last 1 queue))
+        item))))
 
 (behavior ::queue
           :triggers #{:close}
@@ -58,6 +59,7 @@
 
 (behavior ::cache-state
           :triggers #{:active :save :move}
+          :debounce 1000
           :reaction (fn [this]
                       (swap! state-cache assoc this (->state this))))
 
@@ -66,8 +68,6 @@
               :exec (fn []
                       (when-let [state (unqueue!)]
                         (tabs/active! (restore! state))))})
-
-@queue
 
 ;; Implementation for Editors
 
