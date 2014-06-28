@@ -61,12 +61,6 @@
                       (when-let [state (@state-cache this)]
                         (queue! state))))
 
-(behavior ::cache-state
-          :triggers #{:active :save :move}
-          :debounce 1000
-          :reaction (fn [this]
-                      (swap! state-cache assoc this (->state this))))
-
 (cmd/command {:command :reminisce.reopen-tab
               :desc "Tabs: Reopen the last closed tab"
               :exec (fn []
@@ -115,6 +109,12 @@
           :debounce 1000
           :reaction (fn [editor]
                       (cache-tabs)))
+
+(behavior ::cache-state
+          :triggers #{:active :save :move}
+          :debounce 1000
+          :reaction (fn [this]
+                      (swap! state-cache assoc this (->state this))))
 
 ;; Workspace
 
