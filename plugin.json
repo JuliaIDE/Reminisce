@@ -1,7 +1,7 @@
 {
   "name": "Reminisce",
   "author": "Mike Innes",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "source": "https://github.com/one-more-minute/Reminisce",
   "desc": "Sublime style saving of tabs and content",
   "dependencies": {
