@@ -5,7 +5,9 @@
             [lt.objs.command :as cmd]
             [lt.object :as object]
             [lt.objs.tabs :as tabs]
-            [lt.objs.opener :as opener])
+            [lt.objs.opener :as opener]
+            [lt.objs.sidebar :as sidebar]
+            [lt.objs.sidebar.workspace :as workspace])
   (:require-macros [lt.macros :refer [behavior defui]]))
 
 ;; Tab Restore
@@ -111,3 +113,24 @@
           :debounce 1000
           :reaction (fn [editor]
                       (cache-tabs)))
+
+;; Workspace
+
+(defn workspace-open? []
+  (and (= (:active @sidebar/sidebar) workspace/sidebar-workspace)
+       (:open @sidebar/sidebar)))
+
+(defn open-workspace [open]
+  (when (or (and open (not (workspace-open?)))
+            (and (not open) (workspace-open?)))
+    (cmd/exec! :workspace.show)))
+
+(behavior ::cache-workspace
+          :triggers #{:toggle}
+          :reaction (fn []
+                      (cache/store! ::workspace (workspace-open?))))
+
+(behavior ::restore-workspace
+          :triggers #{:post-init}
+          :reaction (fn []
+                      (open-workspace (cache/fetch ::workspace))))
