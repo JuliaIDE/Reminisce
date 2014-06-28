@@ -7,7 +7,9 @@
             [lt.objs.tabs :as tabs]
             [lt.objs.opener :as opener]
             [lt.objs.sidebar :as sidebar]
-            [lt.objs.sidebar.workspace :as workspace])
+            [lt.objs.sidebar.workspace :as workspace]
+            [lt.objs.statusbar :as statusbar]
+            [lt.objs.console :as console])
   (:require-macros [lt.macros :refer [behavior defui]]))
 
 ;; Tab Restore
@@ -134,3 +136,25 @@
           :triggers #{:post-init}
           :reaction (fn []
                       (open-workspace (cache/fetch ::workspace))))
+
+;; Console
+
+(behavior ::cache-console-open
+          :triggers #{:show!}
+          :reaction (fn [bar item]
+                      (when (= item console/console)
+                        (cache/store! ::console true))))
+
+(behavior ::cache-console-close
+          :triggers #{:hide!}
+          :reaction (fn [bar item]
+                      (when (= item console/console)
+                        (cache/store! ::console false))))
+
+(behavior ::restore-console
+          :triggers #{:post-init}
+          :reaction (fn []
+                      (if (cache/fetch ::console)
+                        (cmd/exec! :console.show)
+                        (cmd/exec! :console.hide))))
+

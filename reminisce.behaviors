@@ -1,7 +1,8 @@
 {:+ {:app [(:lt.objs.plugins/load-js "reminisce_compiled.js")
            (:lt.objs.plugins/load-keymap "reminisce.keymap")
            :lt.plugins.reminisce/restore-tabs
-           :lt.plugins.reminisce/restore-workspace]
+           :lt.plugins.reminisce/restore-workspace
+           :lt.plugins.reminisce/restore-console]
 
      :editor [:lt.plugins.reminisce/editor-state
               :lt.plugins.reminisce/trigger-cache-tabs
@@ -9,6 +10,9 @@
               :lt.plugins.reminisce/cache-state
               :lt.plugins.reminisce/queue]
 
-     :sidebar [:lt.plugins.reminisce/cache-workspace]}
+     :sidebar [:lt.plugins.reminisce/cache-workspace]
+
+     :bottombar [:lt.plugins.reminisce/cache-console-open
+                 :lt.plugins.reminisce/cache-console-close]}
 
  :- {:app [:lt.objs.editor.pool/stop-close-dirty]}}
