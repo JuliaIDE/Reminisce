@@ -78,7 +78,7 @@
                       (let [path (-> @editor :info :path)]
                         {:type :editor
                          :file path
-                         :content (when (or path (:dirty @editor))
+                         :content (when (or (not path) (:dirty @editor))
                                     (editor/->val editor))
                          :dirty   (@editor :dirty)
                          :info    (@editor :info)
