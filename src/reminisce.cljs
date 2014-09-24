@@ -5,6 +5,7 @@
             [lt.objs.command :as cmd]
             [lt.object :as object]
             [lt.objs.tabs :as tabs]
+            [lt.objs.app :as app]
             [lt.objs.opener :as opener]
             [lt.objs.sidebar :as sidebar]
             [lt.objs.sidebar.workspace :as workspace]
@@ -31,8 +32,9 @@
 (behavior ::restore-tabs
           :triggers #{:post-init}
           :reaction (fn [this]
-                      (doseq [tab (cache/fetch ::tabs)]
-                        (restore! tab))))
+                      (when (zero? (app/window-number))
+                        (doseq [tab (cache/fetch ::tabs)]
+                          (restore! tab)))))
 
 ;; Undo close
 
@@ -135,7 +137,8 @@
 (behavior ::restore-workspace
           :triggers #{:post-init}
           :reaction (fn []
-                      (open-workspace (cache/fetch ::workspace))))
+                      (when (zero? (app/window-number))
+                        (open-workspace (cache/fetch ::workspace)))))
 
 ;; Console
 
@@ -154,7 +157,8 @@
 (behavior ::restore-console
           :triggers #{:post-init}
           :reaction (fn []
-                      (if (cache/fetch ::console)
-                        (cmd/exec! :console.show)
-                        (cmd/exec! :console.hide))))
+                      (when (zero? (app/window-number))
+                        (if (cache/fetch ::console)
+                          (cmd/exec! :console.show)
+                          (cmd/exec! :console.hide)))))
 
