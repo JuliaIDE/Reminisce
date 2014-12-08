@@ -10,7 +10,8 @@
             [lt.objs.sidebar :as sidebar]
             [lt.objs.sidebar.workspace :as workspace]
             [lt.objs.statusbar :as statusbar]
-            [lt.objs.console :as console])
+            [lt.objs.console :as console]
+            [lt.objs.platform :as platform])
   (:require-macros [lt.macros :refer [behavior defui]]))
 
 ;; Tab Restore
@@ -29,10 +30,13 @@
     (callback)
     (js/setTimeout #(wait-until cond callback) 100)))
 
+(defn first-win? []
+  (= (app/window-number) (if platform/atom-shell 1 0)))
+
 (behavior ::restore-tabs
           :triggers #{:post-init}
           :reaction (fn [this]
-                      (when (zero? (app/window-number))
+                      (when (first-win?)
                         (doseq [tab (cache/fetch ::tabs)]
                           (restore! tab)))))
 
@@ -137,7 +141,7 @@
 (behavior ::restore-workspace
           :triggers #{:post-init}
           :reaction (fn []
-                      (when (zero? (app/window-number))
+                      (when (first-win?)
                         (open-workspace (cache/fetch ::workspace)))))
 
 ;; Console
@@ -157,7 +161,7 @@
 (behavior ::restore-console
           :triggers #{:post-init}
           :reaction (fn []
-                      (when (zero? (app/window-number))
+                      (when (first-win?)
                         (if (cache/fetch ::console)
                           (cmd/exec! :console.show)
                           (cmd/exec! :console.hide)))))
