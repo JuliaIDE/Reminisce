@@ -1,18 +1,23 @@
-{:+ {:app [(:lt.objs.plugins/load-js "reminisce_compiled.js")
-           (:lt.objs.plugins/load-keymap "reminisce.keymap")
-           :lt.plugins.reminisce/restore-tabs
-           :lt.plugins.reminisce/restore-workspace
-           :lt.plugins.reminisce/restore-console]
+[
+ [:app :lt.objs.plugins/load-js "reminisce_compiled.js"]
+ [:app :lt.objs.plugins/load-keymap "reminisce.keymap"]
 
-     :editor [:lt.plugins.reminisce/editor-state
-              :lt.plugins.reminisce/trigger-cache-tabs
+ ;; Tabs
+ [:editor :lt.plugins.reminisce/trigger-cache-tabs]
+ [:app :lt.plugins.reminisce/restore-tabs]
+ [:app :-lt.objs.editor.pool/stop-close-dirty]
 
-              :lt.plugins.reminisce/cache-state
-              :lt.plugins.reminisce/queue]
+ ;; Console
+ [:bottombar :lt.plugins.reminisce/cache-console-open]
+ [:bottombar :lt.plugins.reminisce/cache-console-close]
+ [:app :lt.plugins.reminisce/restore-console]
 
-     :sidebar [:lt.plugins.reminisce/cache-workspace]
+ ;; Reopening closed tabs
+ [:editor :lt.plugins.reminisce/editor-state]
+ [:editor :lt.plugins.reminisce/cache-state]
+ [:editor :lt.plugins.reminisce/queue]
 
-     :bottombar [:lt.plugins.reminisce/cache-console-open
-                 :lt.plugins.reminisce/cache-console-close]}
-
- :- {:app [:lt.objs.editor.pool/stop-close-dirty]}}
+ ;; Workspace tree
+ [:sidebar :lt.plugins.reminisce/cache-workspace]
+ [:app :lt.plugins.reminisce/restore-workspace]
+]
