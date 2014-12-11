@@ -41,7 +41,7 @@
                           (if (empty? tabs)
                             (object/raise app/app :fresh-start)
                             (doseq [tab (cache/fetch ::tabs)]
-                              (restore! tab)))))))
+                              (tabs/active! (restore! tab))))))))
 
 ;; Undo close
 
