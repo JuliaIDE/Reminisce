@@ -114,8 +114,8 @@
     ed))
 
 (behavior ::trigger-cache-tabs
-          :triggers #{:active :save :move}
-          :debounce 1000
+          :triggers #{:active :save :move :close}
+          :debounce 100
           :reaction (fn [editor]
                       (cache-tabs)))
 
