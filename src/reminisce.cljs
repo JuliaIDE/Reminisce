@@ -37,8 +37,11 @@
           :triggers #{:post-init}
           :reaction (fn [this]
                       (when (first-win?)
-                        (doseq [tab (cache/fetch ::tabs)]
-                          (restore! tab)))))
+                        (let [tabs (cache/fetch ::tabs)]
+                          (if (empty? tabs)
+                            (object/raise app/app :fresh-start)
+                            (doseq [tab (cache/fetch ::tabs)]
+                              (restore! tab)))))))
 
 ;; Undo close
 
