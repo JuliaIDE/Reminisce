@@ -111,6 +111,7 @@
       (editor/set-val ed content))
     (.setCursor (editor/->cm-ed ed) (clj->js cursor))
     (apply editor/scroll-to ed scroll)
+    (js/setTimeout #(editor/refresh ed) 500)
     ed))
 
 (behavior ::trigger-cache-tabs
