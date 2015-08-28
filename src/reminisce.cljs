@@ -31,7 +31,7 @@
     (js/setTimeout #(wait-until cond callback) 100)))
 
 (defn first-win? []
-  (= (app/window-number) (if platform/atom-shell 1 0)))
+  (= (app/window-number) (if platform/electron 1 0)))
 
 (behavior ::restore-tabs
           :triggers #{:post-init}
